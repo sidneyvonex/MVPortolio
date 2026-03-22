@@ -1,11 +1,5 @@
 import { Request, Response } from 'express';
-import {
-    getAllContactMessagesService,
-    getContactMessageByIdService,
-    createContactMessageService,
-    markContactMessageReadService,
-    deleteContactMessageService
-} from './contact.service';
+import {getAllContactMessagesService,getContactMessageByIdService,createContactMessageService,markContactMessageReadService,deleteContactMessageService} from './contact.service';
 
 // GET /api/contact
 export const getAllContactMessages = async (req: Request, res: Response) => {

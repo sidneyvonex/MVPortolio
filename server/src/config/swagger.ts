@@ -16,8 +16,8 @@ All **Admin** endpoints require a Bearer token in the Authorization header.
 
 Get a token by calling \`POST /api/auth/login\`.
 
-**Ã°Å¸â€â€œ Public** Ã¢â‚¬â€ No authentication required  
-**Ã°Å¸â€Â Admin** Ã¢â‚¬â€ Requires \`Authorization: Bearer <token>\`
+** Public**  No authentication required  
+** Admin**Requires \`Authorization: Bearer <token>\`
             `,
         },
         servers: [{ url: '/api', description: 'API base path' }],

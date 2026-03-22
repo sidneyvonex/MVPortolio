@@ -27,8 +27,10 @@ const TypingAnimation = () => {
     }
 
     if (deleting && displayed === '') {
-      setDeleting(false);
-      setCurrentIndex((i) => (i + 1) % TYPED_STRINGS.length);
+      timeoutRef.current = setTimeout(() => {
+        setDeleting(false);
+        setCurrentIndex((i) => (i + 1) % TYPED_STRINGS.length);
+      }, 0);
       return;
     }
 
