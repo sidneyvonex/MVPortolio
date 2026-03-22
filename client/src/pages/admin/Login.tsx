@@ -4,6 +4,7 @@ import { Terminal, Lock, Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { authApi } from '../../services/adminApi';
 import { setToken, isAuthenticated } from '../../lib/auth';
 import { useEffect } from 'react';
+import { useAdminHead } from '../../hooks/useAdminHead';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -12,6 +13,8 @@ const AdminLogin = () => {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useAdminHead('Admin Login — CodeSidney');
 
   useEffect(() => {
     if (isAuthenticated()) navigate({ to: '/admin/dashboard' });

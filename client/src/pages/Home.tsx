@@ -10,8 +10,10 @@ import Education from '../components/sections/Education';
 import Community from '../components/sections/Community';
 import Testimonials from '../components/sections/Testimonials';
 import Contact from '../components/sections/Contact';
+import { useDynamicHead } from '../hooks/useDynamicHead';
 
 const Home = () => {
+  useDynamicHead();
   return (
     <main className="relative">
       <Navbar />

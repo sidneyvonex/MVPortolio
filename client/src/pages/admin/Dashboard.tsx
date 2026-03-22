@@ -6,6 +6,7 @@ import {
   Users, MessageSquare, Mail, Settings, LogOut, ChevronRight, Menu, X,
 } from 'lucide-react';
 import { isAuthenticated, clearToken } from '../../lib/auth';
+import { useAdminHead } from '../../hooks/useAdminHead';
 import ProjectsPanel    from '../../components/admin/ProjectsPanel';
 import SkillsPanel      from '../../components/admin/SkillsPanel';
 import ExperiencePanel  from '../../components/admin/ExperiencePanel';
@@ -126,6 +127,8 @@ export default function AdminDashboard() {
   const [active, setActive]       = useState<Section>('projects');
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useAdminHead(`${sectionTitles[active]} — Admin | CodeSidney`);
 
   useEffect(() => {
     if (!isAuthenticated()) navigate({ to: '/admin/login' });
