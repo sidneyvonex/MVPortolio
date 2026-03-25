@@ -33,7 +33,7 @@ const Contact = () => {
 
   const email      = s?.email      || 'bensidneyndungu@gmail.com';
   const phone      = s?.phone      || '+254 798 696 008';
-  const location   = s?.location   || 'Kapsabet, Kenya';
+  const location   = s?.location   || 'Nairobi, Kenya';
   const githubUrl  = s?.githubUrl  || 'https://github.com/bensidney';
   const linkedinUrl = s?.linkedinUrl || 'https://linkedin.com/in/bensidney';
 

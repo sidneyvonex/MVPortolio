@@ -60,20 +60,3 @@ export interface Community {
   bioUrl: string | null;
   order: number;
 }
-
-export interface ContactMessage {
-  name: string;
-  email: string;
-  message: string;
-}
-
-export interface Settings {
-  tagline: string;
-  heroImageUrl: string | null;
-  resumeUrl: string | null;
-  githubUrl: string | null;
-  linkedinUrl: string | null;
-  twitterUrl: string | null;
-  primaryColor: string;
-  accentColor: string;
-}

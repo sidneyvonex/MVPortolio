@@ -2,9 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Save, Loader2, UploadCloud, ExternalLink, Crosshair } from 'lucide-react';
 import { toast } from 'sonner';
 import { settingsApi, type SettingsMap } from '../../services/adminApi';
+import { INP, LBL } from './adminStyles';
 
-const INP = 'w-full bg-white border border-[#E6EAF4] rounded-xl px-3 py-2.5 text-[#0A0A0F] text-sm outline-none focus:border-[#1A56FF] focus:ring-2 focus:ring-[#1A56FF]/10 transition-all placeholder-[#C0C8D8]';
-const LBL = 'text-xs font-medium text-[#8892A4] mb-1.5 block uppercase tracking-wide';
 const CARD = 'bg-white rounded-2xl border border-[#E6EAF4] shadow-sm p-5 flex flex-col gap-4';
 
 const empty: SettingsMap = { tagline: '', heroImageUrl: '', heroFocalPoint: '50% 50%', resumeUrl: '', githubUrl: '', linkedinUrl: '', twitterUrl: '', email: '', phone: '', location: '', aboutBio: '' };

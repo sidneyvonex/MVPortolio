@@ -1,9 +1,8 @@
-﻿import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Terminal, Lock, Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { authApi } from '../../services/adminApi';
 import { setToken, isAuthenticated } from '../../lib/auth';
-import { useEffect } from 'react';
 import { useAdminHead } from '../../hooks/useAdminHead';
 
 const AdminLogin = () => {

@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import DotNavigation from '../components/layout/DotNavigation';
@@ -10,12 +11,24 @@ import Education from '../components/sections/Education';
 import Community from '../components/sections/Community';
 import Testimonials from '../components/sections/Testimonials';
 import Contact from '../components/sections/Contact';
+import PageLoader from '../components/ui/PageLoader';
 import { useDynamicHead } from '../hooks/useDynamicHead';
+import { api } from '../services/api';
 
 const Home = () => {
   useDynamicHead();
+
+  const { isLoading } = useQuery({
+    queryKey: ['settings'],
+    queryFn: api.settings.get,
+    staleTime: 1000 * 60 * 5,
+    retry: 2,
+  });
+
+  if (isLoading) return <PageLoader />;
+
   return (
-    <main className="relative">
+    <main className="relative animate-fadeIn">
       <Navbar />
       <DotNavigation />
       <Hero />
