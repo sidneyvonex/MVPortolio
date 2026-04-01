@@ -27,6 +27,22 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth >= 1024) setMenuOpen(false);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   const handleNav = (id: string) => {
     scrollToSection(id);
     setMenuOpen(false);
@@ -38,13 +54,13 @@ const Navbar = () => {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.7, ease: 'easeOut' }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500
+        className={`fixed top-0 left-0 right-0 z-50 h-16 lg:h-[72px] transition-all duration-500
           ${scrolled
             ? 'bg-white/95 backdrop-blur-xl shadow-sm border-b border-black/5'
             : 'bg-transparent'
           }`}
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 lg:px-16 xl:px-24 py-4">
+        <div className="max-w-7xl h-full mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-16 xl:px-24">
 
           {/* Brand mark */}
           <motion.button
@@ -148,9 +164,9 @@ const Navbar = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.18 }}
-              className="lg:hidden fixed left-0 right-0 top-[68px] z-[53] px-4"
+              className="lg:hidden fixed left-0 right-0 top-[calc(env(safe-area-inset-top)+4rem)] z-[53] px-4"
             >
-              <div className="mx-auto w-full max-w-7xl rounded-2xl border border-white/10 bg-[#0A0A0F]/95 backdrop-blur-xl shadow-2xl p-3">
+              <div className="mx-auto w-full max-w-7xl max-h-[calc(100vh-5rem)] overflow-y-auto rounded-2xl border border-white/10 bg-[#0A0A0F]/95 backdrop-blur-xl shadow-2xl p-3">
                 <div className="flex flex-col gap-1.5">
                   {navLinks.map(({ id, label }, i) => (
                     <motion.button
@@ -173,6 +189,7 @@ const Navbar = () => {
                     href={resumeUrl}
                     download="resume.pdf"
                     rel="noopener noreferrer"
+                    onClick={() => setMenuOpen(false)}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.22 }}
