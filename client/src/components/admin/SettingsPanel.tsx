@@ -161,12 +161,12 @@ export default function SettingsPanel() {
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-[#8892A4]">PDF Preview</p>
-                  <a href={`${import.meta.env.VITE_API_URL || '/api'}/settings/resume/download`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[#1A56FF] text-xs hover:underline">
-                    <ExternalLink size={11} /> Open in new tab
+                  <a href={`${import.meta.env.VITE_API_URL || '/api'}/settings/resume/download`} rel="noopener noreferrer" className="flex items-center gap-1 text-[#1A56FF] text-xs hover:underline">
+                    <ExternalLink size={11} /> Download
                   </a>
                 </div>
                 <iframe
-                  src={`https://docs.google.com/viewer?url=${encodeURIComponent(settings.resumeUrl)}&embedded=true`}
+                  src={settings.resumeUrl}
                   title="Resume Preview"
                   className="w-full rounded-xl border border-[#E6EAF4]"
                   style={{ height: '320px' }}

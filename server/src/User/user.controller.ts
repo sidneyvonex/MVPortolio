@@ -215,14 +215,14 @@ export const uploadResumePdf = async (req: Request, res: Response) => {
                 target: siteSettingsTable.key,
                 set: { value: pdfUrl, updatedAt: new Date() },
             });
-        res.status(200).json({ message: 'Resume uploaded successfully', url: pdfUrl });
+        res.status(200).json({ message: 'Resume uploaded successfully', resumeUrl: pdfUrl });
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Internal Server Error';
         res.status(500).json({ error: message });
     }
 };
 
-// GET /api/settings/resume/download — proxy the stored PDF with correct headers so the browser downloads it as resume.pdf
+// GET /api/settings/resume/download — force-download the stored PDF as resume.pdf
 export const downloadResume = async (req: Request, res: Response) => {
     try {
         const setting = await db.query.siteSettingsTable.findFirst({
@@ -233,12 +233,31 @@ export const downloadResume = async (req: Request, res: Response) => {
             res.status(404).json({ error: 'Resume not found' });
             return;
         }
-        const proto = resumeUrl.startsWith('https') ? https : http;
-        proto.get(resumeUrl, (upstream) => {
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', 'attachment; filename="resume.pdf"');
-            upstream.pipe(res);
-        }).on('error', () => res.status(502).json({ error: 'Failed to fetch resume' }));
+        // For Cloudinary raw URLs, inject the fl_attachment flag so Cloudinary
+        // serves the file with Content-Disposition: attachment and the correct
+        // Content-Type — avoids proxying and the 0-byte issue from unhandled redirects.
+        if (resumeUrl.includes('res.cloudinary.com') && resumeUrl.includes('/raw/upload/')) {
+            const downloadUrl = resumeUrl.replace('/raw/upload/', '/raw/upload/fl_attachment:resume.pdf/');
+            res.redirect(307, downloadUrl);
+            return;
+        }
+        // For non-Cloudinary URLs: proxy with redirect-following
+        const fetchAndPipe = (url: string, hops = 0) => {
+            if (hops > 5) { res.status(502).json({ error: 'Too many redirects' }); return; }
+            const proto = url.startsWith('https') ? https : http;
+            proto.get(url, (upstream) => {
+                const { statusCode, headers } = upstream;
+                if ((statusCode === 301 || statusCode === 302 || statusCode === 307 || statusCode === 308) && headers.location) {
+                    upstream.resume();
+                    fetchAndPipe(headers.location, hops + 1);
+                    return;
+                }
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', 'attachment; filename="resume.pdf"');
+                upstream.pipe(res);
+            }).on('error', () => res.status(502).json({ error: 'Failed to fetch resume' }));
+        };
+        fetchAndPipe(resumeUrl);
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Internal Server Error';
         res.status(500).json({ error: message });

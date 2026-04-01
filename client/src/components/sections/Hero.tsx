@@ -27,10 +27,8 @@ const TypingAnimation = () => {
     }
 
     if (deleting && displayed === '') {
-      timeoutRef.current = setTimeout(() => {
-        setDeleting(false);
-        setCurrentIndex((i) => (i + 1) % TYPED_STRINGS.length);
-      }, 0);
+      setDeleting(false);
+      setCurrentIndex((i) => (i + 1) % TYPED_STRINGS.length);
       return;
     }
 
@@ -64,7 +62,8 @@ const Hero = () => {
 
   const s = settings as Record<string, string> | undefined;
   const tagline  = s?.tagline  || 'Code that solves real problems — not just runs. Building scalable web applications from frontend to backend.';
-  const photoUrl = s?.heroImageUrl || null;
+  const photoUrl = s?.heroImageUrl || 'https://res.cloudinary.com/diia0dapa/image/upload/v1774165277/portfolio/hero/1774165274168-heroImage.png';
+  const focalPt  = s?.heroFocalPoint || '50% 50%';
   const githubUrl   = s?.githubUrl   || 'https://github.com/bensidney';
   const linkedinUrl = s?.linkedinUrl || 'https://linkedin.com/in/bensidney';
   const emailVal    = s?.email       || 'bensidneyndungu@gmail.com';
@@ -218,69 +217,76 @@ const Hero = () => {
             </motion.div>
           </div>
 
-          {/* Right — Floating Photo */}
-          <div className="relative flex justify-center items-center min-h-[420px]">
+          {/* Right — Photo + Floating Cards */}
+          <div className="relative flex justify-center items-center">
 
-            {/* Photo — floats as one unit */}
+            {/* Photo circle */}
             <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="relative z-10"
+              className="relative"
             >
+              {/* Outer ring */}
+              <div className="w-72 h-72 md:w-80 md:h-80 rounded-full
+                              border-2 border-[#FFD600]/40 p-2">
+                {/* Inner ring */}
+                <div className="w-full h-full rounded-full
+                                border-2 border-white/20 p-2">
+                  {/* Photo placeholder / actual photo */}
+                  <div className="w-full h-full rounded-full
+                                  bg-white/10 backdrop-blur-sm
+                                  flex items-center justify-center
+                                  border border-white/10 overflow-hidden">
+                    {photoUrl
+                      ? <img src={photoUrl} alt="Profile" className="w-full h-full object-cover" style={{ objectPosition: focalPt }} />
+                      : <span className="text-white/40 font-heading text-lg">Your Photo</span>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating card — Experience */}
               <motion.div
-                animate={{ y: [0, -14, 0] }}
-                transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
-                className="relative"
+                animate={{ y: [0, -8, 0] }}
+                transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+                className="absolute -left-12 top-8 bg-white rounded-2xl
+                           px-4 py-3 shadow-xl flex items-center gap-3"
               >
-                {/* Photo */}
-                {photoUrl
-                  ? <img src={photoUrl} alt="Profile"
-                      className="w-auto h-[420px] md:h-[500px] max-w-none"
-                    />
-                  : <div className="w-64 h-[420px] md:h-[500px] bg-white/10 flex items-center justify-center">
-                      <span className="text-white/40 font-heading text-lg">Your Photo</span>
-                    </div>
-                }
+                <div className="w-10 h-10 bg-primary/10 rounded-xl
+                                flex items-center justify-center">
+                  <Briefcase size={18} className="text-primary" />
+                </div>
+                <div>
+                  <p className="font-heading font-bold text-[#0A0A0F] text-sm">
+                    1+
+                  </p>
+                  <p className="font-body text-[#8892A4] text-xs">
+                    Years Experience
+                  </p>
+                </div>
+              </motion.div>
 
-                {/* Floating card — Experience */}
-                <motion.div
-                  animate={{ y: [0, -7, 0] }}
-                  transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut', delay: 0.3 }}
-                  className="absolute -left-14 top-10 bg-white rounded-2xl
-                             px-3.5 py-2.5 shadow-xl flex items-center gap-3"
-                >
-                  <div className="w-9 h-9 bg-[#1A56FF]/10 rounded-xl flex items-center justify-center shrink-0">
-                    <Briefcase size={16} className="text-[#1A56FF]" />
-                  </div>
-                  <div>
-                    <p className="font-heading font-bold text-[#0A0A0F] text-sm leading-none">1+</p>
-                    <p className="font-body text-[#8892A4] text-xs mt-0.5">Years Exp.</p>
-                  </div>
-                </motion.div>
-
-                {/* Floating card — Projects */}
-                <motion.div
-                  animate={{ y: [0, 7, 0] }}
-                  transition={{ repeat: Infinity, duration: 3.8, ease: 'easeInOut', delay: 0.8 }}
-                  className="absolute -right-14 bottom-16 bg-white rounded-2xl
-                             px-3.5 py-2.5 shadow-xl flex items-center gap-3"
-                >
-                  <div className="w-9 h-9 bg-[#FFD600]/15 rounded-xl flex items-center justify-center shrink-0">
-                    <Code2 size={16} className="text-[#FFD600]" />
-                  </div>
-                  <div>
-                    <p className="font-heading font-bold text-[#0A0A0F] text-sm leading-none">5+</p>
-                    <p className="font-body text-[#8892A4] text-xs mt-0.5">Projects</p>
-                  </div>
-                </motion.div>
-
-                {/* Small accent dot top-right */}
-                <motion.div
-                  animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
-                  transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-                  className="absolute -top-3 -right-3 w-5 h-5 rounded-full bg-[#FFD600] shadow-lg shadow-[#FFD600]/50"
-                />
+              {/* Floating card — Projects */}
+              <motion.div
+                animate={{ y: [0, 8, 0] }}
+                transition={{ repeat: Infinity, duration: 3.5,
+                             ease: 'easeInOut', delay: 0.5 }}
+                className="absolute -right-12 bottom-12 bg-white rounded-2xl
+                           px-4 py-3 shadow-xl flex items-center gap-3"
+              >
+                <div className="w-10 h-10 bg-[#FFD600]/10 rounded-xl
+                                flex items-center justify-center">
+                  <Code2 size={18} className="text-[#FFD600]" />
+                </div>
+                <div>
+                  <p className="font-heading font-bold text-[#0A0A0F] text-sm">
+                    5+
+                  </p>
+                  <p className="font-body text-[#8892A4] text-xs">
+                    Projects Built
+                  </p>
+                </div>
               </motion.div>
             </motion.div>
           </div>
