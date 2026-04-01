@@ -99,7 +99,7 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-3">
             <motion.a
               href={resumeUrl}
-              target="_blank"
+              download="resume.pdf"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -184,7 +184,7 @@ const Navbar = () => {
 
             <motion.a
               href={resumeUrl}
-              target="_blank"
+              download="resume.pdf"
               rel="noopener noreferrer"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

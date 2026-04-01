@@ -222,7 +222,7 @@ export const uploadResumePdf = async (req: Request, res: Response) => {
     }
 };
 
-// GET /api/settings/resume/download — force-download the stored PDF as resume.pdf
+// GET /api/settings/resume/download — proxy-stream the PDF with download headers (follows redirects)
 export const downloadResume = async (req: Request, res: Response) => {
     try {
         const setting = await db.query.siteSettingsTable.findFirst({
@@ -233,33 +233,52 @@ export const downloadResume = async (req: Request, res: Response) => {
             res.status(404).json({ error: 'Resume not found' });
             return;
         }
-        // For Cloudinary raw URLs, inject the fl_attachment flag so Cloudinary
-        // serves the file with Content-Disposition: attachment and the correct
-        // Content-Type — avoids proxying and the 0-byte issue from unhandled redirects.
-        if (resumeUrl.includes('res.cloudinary.com') && resumeUrl.includes('/raw/upload/')) {
-            const downloadUrl = resumeUrl.replace('/raw/upload/', '/raw/upload/fl_attachment:resume.pdf/');
-            res.redirect(307, downloadUrl);
-            return;
-        }
-        // For non-Cloudinary URLs: proxy with redirect-following
-        const fetchAndPipe = (url: string, hops = 0) => {
-            if (hops > 5) { res.status(502).json({ error: 'Too many redirects' }); return; }
+
+        // Fetch the PDF server-side, following up to 5 redirects, then
+        // stream it back with headers that force the browser to download the file.
+        const proxyDownload = (url: string, hops = 0) => {
+            if (hops > 5) {
+                if (!res.headersSent) res.status(502).json({ error: 'Too many redirects' });
+                return;
+            }
             const proto = url.startsWith('https') ? https : http;
-            proto.get(url, (upstream) => {
-                const { statusCode, headers } = upstream;
-                if ((statusCode === 301 || statusCode === 302 || statusCode === 307 || statusCode === 308) && headers.location) {
-                    upstream.resume();
-                    fetchAndPipe(headers.location, hops + 1);
-                    return;
+            const reqOptions = new URL(url);
+            proto.get(
+                { hostname: reqOptions.hostname, path: reqOptions.pathname + reqOptions.search, headers: { 'User-Agent': 'node-pdf-proxy' } },
+                (upstream) => {
+                    const { statusCode, headers: upHeaders } = upstream;
+                    if (
+                        (statusCode === 301 || statusCode === 302 || statusCode === 307 || statusCode === 308) &&
+                        upHeaders.location
+                    ) {
+                        // Follow redirect — resolve relative locations if needed
+                        const next = upHeaders.location.startsWith('http')
+                            ? upHeaders.location
+                            : `${reqOptions.protocol}//${reqOptions.host}${upHeaders.location}`;
+                        upstream.resume();
+                        proxyDownload(next, hops + 1);
+                        return;
+                    }
+                    if (statusCode !== 200) {
+                        upstream.resume();
+                        if (!res.headersSent) res.status(502).json({ error: `Upstream returned ${statusCode}` });
+                        return;
+                    }
+                    res.setHeader('Content-Type', 'application/pdf');
+                    res.setHeader('Content-Disposition', 'attachment; filename="resume.pdf"');
+                    if (upHeaders['content-length']) res.setHeader('Content-Length', upHeaders['content-length']);
+                    upstream.pipe(res);
                 }
-                res.setHeader('Content-Type', 'application/pdf');
-                res.setHeader('Content-Disposition', 'attachment; filename="resume.pdf"');
-                upstream.pipe(res);
-            }).on('error', () => res.status(502).json({ error: 'Failed to fetch resume' }));
+            ).on('error', () => {
+                if (!res.headersSent) res.status(502).json({ error: 'Failed to fetch resume' });
+            });
         };
-        fetchAndPipe(resumeUrl);
+
+        proxyDownload(resumeUrl);
     } catch (error) {
-        const message = error instanceof Error ? error.message : 'Internal Server Error';
-        res.status(500).json({ error: message });
+        if (!res.headersSent) {
+            const message = error instanceof Error ? error.message : 'Internal Server Error';
+            res.status(500).json({ error: message });
+        }
     }
 };
